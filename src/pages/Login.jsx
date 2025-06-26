@@ -1,6 +1,13 @@
+import { useState } from "react";
 import { FakebookTitle } from "../icons"
+import Register from "./Register"
 
 function Login() {
+  const [resetForm, setResetForm] = useState(false);
+  const onClose = () =>{
+    setResetForm(prv=>!prv)
+  }
+  
   return (
     <>
       <div className="h-[700px] pt-20 pb-28 bg-[#f2f4f7]">
@@ -28,7 +35,8 @@ function Login() {
 
                   <div className="divider my-0"></div>
 
-                  <button className="btn btn-secondary text-lg w-3/5 mx-auto bg-[#43b82b] border-[#43b82b]">
+                  <button type="button" className="btn btn-secondary text-lg w-3/5 mx-auto bg-[#43b82b] border-[#43b82b]"
+                  onClick={()=>document.getElementById("register-form").showModal()}>
                     Create new account
                   </button>
                 </div>
@@ -39,14 +47,12 @@ function Login() {
       </div>
 
       <div>
-        <dialog id="my_modal_3" className="modal">
+        <dialog id="register-form" className="modal" onClose={onClose}>
           <div className="modal-box">
+            <Register resetForm={resetForm} />
             <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
               <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             </form>
-            <h3 className="font-bold text-lg">Hello!</h3>
-            <p className="py-4">Press ESC key or click on ✕ button to close</p>
           </div>
         </dialog>
       </div>
