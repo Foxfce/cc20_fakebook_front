@@ -1,13 +1,37 @@
 import { useState } from "react";
 import { FakebookTitle } from "../icons"
 import Register from "./Register"
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import { loginSchema } from "../utils/validators";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 function Login() {
-  const [resetForm, setResetForm] = useState(false);
-  const onClose = () =>{
-    setResetForm(prv=>!prv)
+  const { handleSubmit, register, formState: { isSubmitting, errors }, reset } = useForm({
+    resolver: yupResolver(loginSchema)
+  })
+
+  const onLogin = async data => {
+    try {
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
+      const resp = await axios.post('http://localhost:5069/api/auth/login',data);
+      console.log(resp);
+      toast.success(resp.data.msg);
+      // alert(JSON.stringify(data, null, 2));
+      // reset();
+    } catch (error) {
+      const errMsg = error.response?.data?.error || error.message
+      console.error(errMsg);
+      
+    }
   }
-  
+
+  const [resetForm, setResetForm] = useState(false);
+  const onClose = () => {
+    setResetForm(prv => !prv)
+  }
+
   return (
     <>
       <div className="h-[700px] pt-20 pb-28 bg-[#f2f4f7]">
@@ -18,28 +42,40 @@ function Login() {
               Fakebook helps you connect and share with the people in your life
             </h2>
           </div>
-          <div className="flex flex-col gap-4 mt-20 basis-2/5 h-[350px] bg-white">
+          <div className="flex flex-col gap-4 mt-20 basis-2/5 h-[350px] bg-white min-w-fit">
             <div className="card bg-base-100 w-full h-[350px] shadow-xl mt-8">
-              <form>
-                <div className="card-body">
+              <form onSubmit={handleSubmit(onLogin)}>
+                <fieldset disabled={isSubmitting}>
+                  <div className="card-body">
 
-                  <input className="input w-full"
-                    type="text" placeholder="E-mail or Phone number" />
+                    <div className="w-full">
+                      <input className="input w-full"
+                        type="text" placeholder="E-mail or Phone number"
+                        {...register('identity')} />
+                    </div>
 
-                  <input className="input w-full"
-                    type="password" placeholder="Password" />
+                    <div className="w-full">
+                      <input className="input w-full"
+                        type="password" placeholder="Password"
+                        {...register('password')} />
+                      <p className='text-sm text-error'>
+                        {(errors.identity || errors.password) ? (errors.identity?.message || errors.password?.message) : null}</p>
+                    </div>
 
-                  <button className="btn btn-primary text-xl">Login</button>
+                    {!isSubmitting && <button className="btn btn-primary text-xl">Login</button>}
+                    {isSubmitting && <button className="btn btn-primary text-xl">Login
+                      <span className="loading loading-spinner text-info absolute right-2/6"></span></button>}
 
-                  <p className="text-center cursor-pointer opacity-70">Forgoten password?</p>
+                    <p className="text-center cursor-pointer opacity-70">Forgoten password?</p>
 
-                  <div className="divider my-0"></div>
+                    <div className="divider my-0"></div>
 
-                  <button type="button" className="btn btn-secondary text-lg w-3/5 mx-auto bg-[#43b82b] border-[#43b82b]"
-                  onClick={()=>document.getElementById("register-form").showModal()}>
-                    Create new account
-                  </button>
-                </div>
+                    <button type="button" className="btn btn-secondary text-lg w-3/5 mx-auto min-w-fit bg-[#43b82b] border-[#43b82b]"
+                      onClick={() => document.getElementById("register-form").showModal()}>
+                      Create new account
+                    </button>
+                  </div>
+                </fieldset>
               </form>
             </div>
           </div>

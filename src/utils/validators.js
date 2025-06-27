@@ -20,11 +20,11 @@ export const registerSchema = object({
 export const loginSchema = object({
   identity: string()
     .test('Identity check',
-      'Identity must be a valid email or mobile number',
+      'Please input your E-mail or Password',
       value => {
         return emailRegex.test(value) || mobileRegex.test(value)
       }),
-  password: string().min(4).required("Please insert your password"),
+  password: string().required("Please insert your password"),
   email: string().email(),
   mobile: string().matches(mobileRegex, `invalid mobile phone`)
 }).noUnknown();
