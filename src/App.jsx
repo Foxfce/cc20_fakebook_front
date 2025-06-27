@@ -6,11 +6,13 @@ function App() {
 
   return (
     <>
-      <AppRouter />
       <ToastContainer
         position='top-center'
-        style={{ zIndex: 9999 }}
+        style={{
+          zIndex: 9999,
+        }}
       />
+      <AppRouter />
     </>
   )
 }

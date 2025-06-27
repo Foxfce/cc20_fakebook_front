@@ -2,6 +2,8 @@ import { useState, lazy, Suspense } from "react";
 // lazy , Suspense new import method , not import immediatly
 
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router";
+import useUserStore from "../stores/userStore";
+import UserLayout from "../layout/userLayout";
 // import Friends from "../pages/Friends";
 // import Profile from "../pages/Profile";
 // import Home from "../pages/Home";
@@ -21,10 +23,8 @@ const guestRouter = createBrowserRouter([
 const userRouter = createBrowserRouter([
   {
     path: '/', element:
-      <>
-        <div className="text-4xl py-4">Header</div>
-        <Outlet />
-      </>,
+      <UserLayout />
+      ,
     children: [
       { index: true,element: <Home /> },
       { path: '/friends', element: <Friends /> },
@@ -35,14 +35,12 @@ const userRouter = createBrowserRouter([
 ])
 
 function AppRouter() {
-  let user =null;
-  // let user = 'andy';
-  //  const [user, setUser] = useState(false);
+  const user =useUserStore(state => state.user);
   const finalRouter = user? userRouter : guestRouter;
  
   return (
     <Suspense fallback={<p>Loading...</p>}>
-    <RouterProvider router={finalRouter} />
+    <RouterProvider key={user?.id} router={finalRouter} />
     </Suspense>
   )
 }

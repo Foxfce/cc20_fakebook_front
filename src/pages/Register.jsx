@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { loginSchema, registerSchema } from '../utils/validators';
 import { useEffect } from 'react';
-import axios from 'axios';
+import { authApi } from '../api/authApi';
 import { toast } from 'react-toastify';
 
 
@@ -20,7 +20,7 @@ function Register({ resetForm }) {
   const onSubmit = async data => {
     try {
       // await new Promise((resolve) => setTimeout(resolve, 2000));
-      const resp = await axios.post('http://localhost:5069/api/auth/register',data);
+      const resp = await authApi.post('/register',data);
       console.log(resp);
       toast.success(resp.data.msg);
       // alert(JSON.stringify(data, null, 2));
@@ -28,6 +28,7 @@ function Register({ resetForm }) {
       // reset();
     } catch (error) {
       const errMsg = error.response?.data?.error || error.message
+      toast.error(errMsg);
       console.error(errMsg);
     }
   }

@@ -4,33 +4,35 @@ import Register from "./Register"
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { loginSchema } from "../utils/validators";
-import axios from "axios";
 import { toast } from "react-toastify";
+import useUserStore from "../stores/userStore";
 
 function Login() {
   const { handleSubmit, register, formState: { isSubmitting, errors }, reset } = useForm({
     resolver: yupResolver(loginSchema)
   })
 
+  const [resetForm, setResetForm] = useState(false);
+  const onClose = () => {
+    setResetForm(prv => !prv)
+  }
+
+  // Zustand state user
+  const logIn = useUserStore(state => state.login)
+
   const onLogin = async data => {
     try {
-      // await new Promise((resolve) => setTimeout(resolve, 2000));
-      const resp = await axios.post('http://localhost:5069/api/auth/login',data);
-      console.log(resp);
-      toast.success(resp.data.msg);
-      // alert(JSON.stringify(data, null, 2));
-      // reset();
+      const resp = await logIn(data)
+      // toast.success(resp.data.msg);
+      reset();
     } catch (error) {
-      const errMsg = error.response?.data?.error || error.message
+      const errMsg = error.response?.data?.error || error.message;
+      toast.error(errMsg);
       console.error(errMsg);
       
     }
   }
 
-  const [resetForm, setResetForm] = useState(false);
-  const onClose = () => {
-    setResetForm(prv => !prv)
-  }
 
   return (
     <>
@@ -82,7 +84,7 @@ function Login() {
         </div>
       </div>
 
-      <div>
+      <div className="absolute z-1">
         <dialog id="register-form" className="modal" onClose={onClose}>
           <div className="modal-box">
             <Register resetForm={resetForm} />

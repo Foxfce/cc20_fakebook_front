@@ -58,3 +58,7 @@
  --tab-border: 2px;
  --tab-radius: 0.5rem;
 }
+
+.toastify-zindex-fix {
+  z-index: 9999 !important;
+}

@@ -1,6 +1,10 @@
+import SidebarMenu from "../components/SidebarMenu"
+
 function Home() {
   return (
-    <div>Home</div>
+    <>
+      <SidebarMenu />
+    </>
   )
 }
 export default Home
