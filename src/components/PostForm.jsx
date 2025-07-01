@@ -3,13 +3,51 @@ import { FriendIcon, PictureIcon } from "../icons";
 import useUserStore from "../stores/userStore"
 import Avatar from "./Avatar";
 import AddPicture from "./AddPicture";
+import usePostStore from "../stores/postStore";
+import { toast } from "react-toastify";
 
 function PostForm() {
   const user = useUserStore(state => state.user);
-  const [addPic, setAddPic] = useState(true);
+  const token = useUserStore(state => state.token);
+
+  const loading = usePostStore(state => state.loading);
+  const createPost = usePostStore(state => state.createPost);
+
+  const [message, setMessage] = useState('');
+  const [addPic, setAddPic] = useState(false);
+  const [file, setFile] = useState(null);
+
+  const hdlCreatePost = async () => {
+    try {
+      // new FormData create a form data structure for easily use
+      const body = new FormData();
+      // append create something like {message : message} ('objkey',value)
+      body.append('message', message);
+      if (file) {
+        body.append('image', file);
+      }
+
+      // Way to log out the body Form
+      // for(let el of body){
+      //   console.log(el);
+      // }
+      const resp = await createPost(body, token, user)
+      toast(resp.data.message);
+      document.getElementById('postform-modal').close();
+
+    } catch (error) {
+      const errMsg = error.response?.data.error || error.message
+      toast(errMsg);
+
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2 bg-white">
-      <h3 className="text-xl text-center">Create Post</h3>
+      <h3 className="text-xl text-center">
+        {loading && <span className="loading loading-dots loading-sm"></span>}
+        Create Post
+      </h3>
       <div className="divider mt-1 mb-0" />
       <div className="flex gap-2">
         <Avatar
@@ -31,11 +69,14 @@ function PostForm() {
       <textarea
         className="textarea textarea-ghost w-full"
         placeholder={`What do you think ${user.firstName}?`}
+        value={message}
+        onChange={e => setMessage(e.target.value)}
+        rows={message.split('\n').length < 12 ? message.split('\n').length : 12}
       ></textarea>
 
       {
         addPic &&
-        <AddPicture />
+        <AddPicture file={file} setFile={setFile} />
       }
 
       <div className="flex justify-between border rounded-lg p-2 items-center">
@@ -49,7 +90,10 @@ function PostForm() {
       </div>
       <div className="divider mt-1 mb-0" />
 
-      <button className="btn btn-primary">Create Post</button>
+      <button className="btn btn-primary"
+        onClick={hdlCreatePost}
+        disabled={message.trim().length === 0 && !file}
+      >Create Post</button>
 
     </div>
   )
