@@ -1,5 +1,5 @@
 import { create, useStore } from "zustand";
-import { createPost, deletePost, getAllPosts } from "../api/postApi";
+import { createPost, deletePost, editPost, getAllPosts } from "../api/postApi";
 import useUserStore from "./userStore";
 
 const usePostStore = create((set, get) => ({
@@ -30,7 +30,13 @@ const usePostStore = create((set, get) => ({
     get().getAllPosts()
     return resp;
   },
-  setCurrentPost : (post) =>set({currentPost : post})
+  setCurrentPost : (post) =>set({currentPost : post}),
+  updatePost : async (id,body) =>{
+    const token = useUserStore.getState().token;
+    const resp = await editPost(id,body,token)
+    get().getAllPosts()
+    return resp
+  }
 })
 );
 
