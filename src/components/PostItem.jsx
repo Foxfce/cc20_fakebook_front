@@ -4,6 +4,7 @@ import usePostStore from "../stores/postStore";
 import useUserStore from "../stores/userStore"
 import Avatar from "./Avatar"
 import { toast } from "react-toastify";
+import CommentContainer from "./CommentContainer";
 
 function PostItem({ post }) {
   const user = useUserStore(state => state.user);
@@ -11,11 +12,22 @@ function PostItem({ post }) {
   const getAllPosts = usePostStore(state => state.getAllPosts);
   const deletePost = usePostStore(state => state.deletePost);
   const setCurrentPost = usePostStore(state => state.setCurrentPost);
+  const createLike = usePostStore(state => state.createLike);
+  const unLike = usePostStore(state => state.unLike);
 
 
   const hdlShowEditModal = () => {
     setCurrentPost(post);
     document.getElementById('editform-modal').showModal();
+  }
+
+  const haveLike = () => post.likes.some(el => el.userId === user.id);
+  const hdlLikeClick = async () => {
+    if (haveLike()) {
+      await unLike(post.id);
+    } else {
+      await createLike({ postId: post.id });
+    }
   }
 
   const hdlDelete = async () => {
@@ -105,7 +117,10 @@ function PostItem({ post }) {
         {/* Like Comment Share buttons */}
         <div className="flex gap-3 justify-between">
 
-          <div className={`flex-1 flex items-center gap-3 justify-center cursor-pointer hover:bg-gray-300 rounded-lg py-2 text-lg font-medium ${Math.random() > 0.5 ? 'bg-blue-300' : ''}`}>
+          <div
+            className={`flex-1 flex items-center gap-3 justify-center cursor-pointer hover:bg-gray-300 rounded-lg py-2 text-lg font-medium ${haveLike() ? 'bg-blue-300' : ''}`}
+            onClick={hdlLikeClick}
+          >
             <LikeIcon className='w-8' />
             Like
           </div>
@@ -121,6 +136,8 @@ function PostItem({ post }) {
           </div>
 
         </div>
+        <div className="diveder h-0 my-0" />
+        <CommentContainer postId={post.id} comments={post.comments} />
       </div>
     </div>
   )

@@ -14,7 +14,7 @@ function PostFormEdit() {
   // const loading = usePostStore(state => state.loading);
 
   const [message, setMessage] = useState(currentPost.message);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);line
   const [addPic, setAddPic] = useState(false);
   const [file, setFile] = useState(null);
   const [removePic, setRemovePic] = useState(false);

@@ -1,5 +1,5 @@
-import { create, useStore } from "zustand";
-import { createPost, deletePost, editPost, getAllPosts } from "../api/postApi";
+import { create } from "zustand";
+import { createComment, createLike, createPost, deletePost, editPost, getAllPosts, unLike } from "../api/postApi";
 import useUserStore from "./userStore";
 
 const usePostStore = create((set, get) => ({
@@ -11,8 +11,8 @@ const usePostStore = create((set, get) => ({
     const resp = await createPost(body, token); // This is createPost from postApi
     // get().getAllPosts(); // To refresh post : not good performance
     console.log(resp.data.result);
-    set( state => ({
-      posts : [{ ...resp.data.result, user, likes: [], comments: [] }, ...state.posts]
+    set(state => ({
+      posts: [{ ...resp.data.result, user, likes: [], comments: [] }, ...state.posts]
     }))
     return resp
   },
@@ -20,22 +20,40 @@ const usePostStore = create((set, get) => ({
     let tk = useUserStore.getState().token
     // await new Promise(rs=> setTimeout(rs,2000));
     const resp = await getAllPosts(tk)
-    set({posts : resp.data.posts});
+    set({ posts: resp.data.posts });
     return resp
   },
-  deletePost : async (id) =>{
+  deletePost: async (id) => {
     const token = useUserStore.getState().token;
-    const resp = await deletePost(id,token);
+    const resp = await deletePost(id, token);
     console.log(resp);
     get().getAllPosts()
     return resp;
   },
-  setCurrentPost : (post) =>set({currentPost : post}),
-  updatePost : async (id,body) =>{
+  setCurrentPost: (post) => set({ currentPost: post }),
+  updatePost: async (id, body) => {
     const token = useUserStore.getState().token;
-    const resp = await editPost(id,body,token)
+    const resp = await editPost(id, body, token)
     get().getAllPosts()
     return resp
+  },
+  createLike: async(body) =>{
+    const token = useUserStore.getState().token;
+    const resp = await createLike(body, token);
+    get().getAllPosts();
+    return resp;
+  },
+  unLike: async(id) =>{
+    const token = useUserStore.getState().token;
+    const resp = await unLike(id, token);
+    get().getAllPosts();
+    return resp;
+  },
+  createComment: async(body) =>{
+    const token = useUserStore.getState().token;
+    const resp = await createComment(body, token);
+    get().getAllPosts();
+    return resp;
   }
 })
 );
